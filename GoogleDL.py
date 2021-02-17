@@ -77,7 +77,7 @@ class GoogleImage:
             pbar = tqdm(total=n_images, leave=True)
 
         while n_downloads < n_images:
-            self._scroll(pager=self.driver, time_sleep=self.time_sleep)
+            self._scroll(driver=self.driver, time_sleep=self.time_sleep)
             all_img = self.driver.find_elements_by_class_name('isv-r')
 
             for n, im in enumerate(all_img):
