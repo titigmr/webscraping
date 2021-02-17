@@ -51,6 +51,7 @@ class GoogleImage:
         self.all_files = []
         self.ext_default = ext_default
         self.close_after_download = close_after_download
+        self.make_dir = make_dir
 
     def close(self):
         "Close the webdriver."
@@ -98,7 +99,7 @@ class GoogleImage:
                 file = self._download_img(link, directory=directory,
                                           name=name,
                                           ext_default=self.ext_default,
-                                          make_dir=True)
+                                          make_dir=self.make_dir)
                 n_downloads += 1
                 if self.verbose:
                     pbar.update(1)
