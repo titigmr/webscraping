@@ -135,7 +135,7 @@ class GoogleImage:
                       make_dir=True):
 
         _, ext = os.path.splitext(os.path.basename(link))
-        self.VALID_EXTENTION = (".png", ".jpg", ".jpeg")
+        self.VALID_EXTENSION = (".png", ".jpg", ".jpeg")
         if ext not in self.VALID_EXTENTION:
             ext = ext_default
         name += ext
