@@ -4,6 +4,7 @@ import os
 import pathlib
 import time
 import selenium
+
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
@@ -66,7 +67,6 @@ class GoogleImage:
         request: str, request searched in google image.
         n_images: int, number of images downloaded.
         directory: str, where images are downloaded.
-
 
         """
         url = f"https://www.google.fr/search?q={request}&tbm=isch"
@@ -135,8 +135,8 @@ class GoogleImage:
                       make_dir=True):
 
         _, ext = os.path.splitext(os.path.basename(link))
-        ext = ext.split('?')[0]
-        if '.' not in ext:
+        self.VALID_EXTENTION = (".png", ".jpg", ".jpeg")
+        if ext not in self.VALID_EXTENTION:
             ext = ext_default
         name += ext
         path = self._create_path_name(directory=directory,
