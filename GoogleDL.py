@@ -70,6 +70,7 @@ class GoogleImage:
         url = f"https://www.google.fr/search?q={request}&tbm=isch&pws=0"
         n_downloads = 0
         n_unload = 0
+        n_str = len(str(n_images))
 
         self.driver.get(url)
         self.name = name
@@ -78,58 +79,46 @@ class GoogleImage:
         self.n_images = n_images
 
         self._scroll(driver=self.driver, time_sleep=self.time_sleep)
-
         all_img = self.driver.find_elements_by_class_name('isv-r')
-        if len(all_img) < n_images:
-            total_img = len(all_img)
-        else:
-            total_img = n_images
 
         if self.verbose:
-            pbar = tqdm(total=total_img, leave=True, desc=self.name)
+            all_img = tqdm(all_img[:n_images], desc=self.name, leave=True)
 
-        for n, im in enumerate(all_img):
+        for im in all_img:
             if self._verify_image(im):
                 im.click()
             else:
                 if self.verbose:
                     n_unload += 1
-                    pbar.set_postfix({'unloaded': n_unload})
-                    pbar.update(1)
+                    all_img.set_postfix({'unloaded': n_unload})
                 continue
             img = self.driver.find_element_by_id('islsp')
             time.sleep(self.time_sleep)
             soup_img = BeautifulSoup(
                 img.get_attribute('innerHTML'), 'lxml')
             balise_link = soup_img.select('img[src*="http"]')
+
             if len(balise_link) < 1:
                 if self.verbose:
                     n_unload += 1
-                    pbar.set_postfix({'unloaded': n_unload})
-                    pbar.update(1)
+                    all_img.set_postfix({'unloaded': n_unload})
                 continue
+
             link = balise_link[0]["src"]
-            n_str = len(str(n_images))
             name_img = f'{self.name}_{n_downloads:0{n_str}d}'
             file = self._download_img(link, directory=directory,
                                         name=name_img,
                                         ext_default=self.ext_default,
                                         make_dir=self.make_dir)
 
-            if file is None:
-                n_unload += 1
-            else:
+            if file is not None:
                 n_downloads += 1
                 self.all_files.append(file)
 
-            if self.verbose:
-                pbar.update(1)
-                if file is None:
-                    pbar.set_postfix({'unloaded': n_unload})
-            if n > n_images:
-                break
-        if self.verbose:
-            pbar.close()
+            if self.verbose and file is None:
+                n_unload += 1
+                all_img.set_postfix({'unloaded': n_unload})
+
         if self.close_after_download:
             self.close()
 
@@ -145,7 +134,7 @@ class GoogleImage:
                 "return document.body.scrollHeight")
             if new_height == last_height:
                 actualise = driver.find_element_by_class_name('mye4qd')
-                if actualise.size['height'] > 0:
+                if actualise.size['height'] > 0 and actualise.size['width'] > 0:
                     actualise.click()
                 else:
                     break
